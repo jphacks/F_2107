@@ -2,11 +2,20 @@ package com.example.sleeptaskapp;
 
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.fragment.NavHostFragment;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.CalendarView;
+import android.widget.ListView;
+
+import com.example.sleeptaskapp.databinding.FragmentCalendarBinding;
+import com.example.sleeptaskapp.databinding.FragmentTaskListBinding;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -19,6 +28,8 @@ public class CalendarFragment extends Fragment {
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
+
+    private FragmentCalendarBinding binding;
 
     // TODO: Rename and change types of parameters
     private String mParam1;
@@ -59,6 +70,24 @@ public class CalendarFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_calendar, container, false);
+        binding = FragmentCalendarBinding.inflate(inflater, container, false);
+        return binding.getRoot();
     }
+
+    public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        binding.calendar.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
+            @Override
+            public void onSelectedDayChange(CalendarView view, int year, int month, int dayOfMonth) {
+                Log.d("you" , year + "年" + (month + 1) + "月" + dayOfMonth + "日");
+                NavHostFragment.findNavController(CalendarFragment.this)
+                        .navigate(R.id.action_CalendarFragment_to_TaskList);
+            }
+        });
+
+    }
+
+
+
 }
