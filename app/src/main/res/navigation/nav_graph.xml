@@ -24,5 +24,43 @@
         <action
             android:id="@+id/action_SecondFragment_to_FirstFragment"
             app:destination="@id/FirstFragment" />
+
+        <action
+            android:id="@+id/action_SecondFragment_to_CalendarFragment"
+            app:destination="@id/calendar" />
     </fragment>
+
+    <fragment
+        android:id="@+id/ThirdFragment"
+        android:name="com.example.sleeptaskapp.ThirdFragment"
+        android:label="Add Task Fragment"
+        tools:layout="@layout/fragment_third">
+
+        <action
+            android:id="@+id/action_ThirdFragment_to_TaskListFragment"
+            app:destination="@id/TaskLit" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/TaskLit"
+        android:name="com.example.sleeptaskapp.TaskList"
+        android:label="Task List Fragment"
+        tools:layout="@layout/fragment_task_list">
+
+        <action
+            android:id="@+id/action_TaskListFragment_to_ThirdFragment"
+            app:destination="@id/ThirdFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/calendar"
+        android:name="com.example.sleeptaskapp.CalendarFragment"
+        android:label="Calendar Fragment"
+        tools:layout="@layout/fragment_calendar">
+
+        <action
+            android:id="@+id/action_CalendarFragment_to_TaskList"
+            app:destination="@id/TaskLit" />
+    </fragment>
+
 </navigation>
