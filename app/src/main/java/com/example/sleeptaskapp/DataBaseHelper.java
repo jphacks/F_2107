@@ -19,6 +19,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
     public static final String COL_2 = "TASK";
     public static final String COL_3 = "TIME";
     public static final String COL_4 = "ENTIRE";
+    public static final String COL_5 = "DAY";
 
     public DataBaseHelper(Context context) {
         super(context, DATABASE_NAME, null, 1);
@@ -26,7 +27,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
-        sqLiteDatabase.execSQL("CREATE TABLE " + TABLE_NAME + " (ID INTEGER PRIMARY KEY AUTOINCREMENT, TASK TEXT, TIME TEXT, ENTIRE TEXT)");
+        sqLiteDatabase.execSQL("CREATE TABLE " + TABLE_NAME + " (ID INTEGER PRIMARY KEY AUTOINCREMENT, TASK TEXT, TIME TEXT, ENTIRE TEXT, DAY TEXT)");
     }
 
     @Override
@@ -35,12 +36,13 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME);
     }
 
-    public boolean insertData(String task, String time, String endtime) {
+    public boolean insertData(String task, String time, String endtime,String DAY) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
         contentValues.put(COL_2,task);
         contentValues.put(COL_3,time);
         contentValues.put(COL_4,endtime);
+        contentValues.put(COL_5,DAY);
         long result = -1;
         try {
              result = db.insert(TABLE_NAME, null, contentValues);

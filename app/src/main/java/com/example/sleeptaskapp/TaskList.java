@@ -7,6 +7,7 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.fragment.NavHostFragment;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,6 +30,7 @@ public class TaskList extends Fragment {
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
+    private static final String ARG_PARAM3 = "param3";
     DataBaseHelper myDb;
 
     private FragmentTaskListBinding binding;
@@ -36,7 +38,12 @@ public class TaskList extends Fragment {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
+    private String mParam3;
+    int year;
+    int month;
+    int dayOfMonth;
     private ArrayAdapter<String> adapter;
+    private String DAY;
 
     public TaskList() {
         // Required empty public constructor
@@ -51,11 +58,12 @@ public class TaskList extends Fragment {
      * @return A new instance of fragment TaskList.
      */
     // TODO: Rename and change types and number of parameters
-    public static TaskList newInstance(String param1, String param2) {
+    public static TaskList newInstance(String param1, String param2, String param3) {
         TaskList fragment = new TaskList();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
+        args.putString(ARG_PARAM3, param3);
         fragment.setArguments(args);
         return fragment;
     }
@@ -66,8 +74,10 @@ public class TaskList extends Fragment {
         binding.AddTaskButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                Bundle bundle = new Bundle();
+                bundle.putString("DAY", DAY);
                 NavHostFragment.findNavController(TaskList.this)
-                        .navigate(R.id.action_TaskListFragment_to_ThirdFragment);
+                        .navigate(R.id.action_TaskListFragment_to_ThirdFragment,bundle);
             }
         });
 
@@ -75,14 +85,19 @@ public class TaskList extends Fragment {
         adapter=new ArrayAdapter<String>(getContext(), android.R.layout.simple_list_item_1);
         listView.setAdapter(adapter);
         ClickMe2();
+
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
+            /*
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
+            mParam3 = getArguments().getString(ARG_PARAM3);*/
+            DAY = getArguments().getString("DAY");
+            Log.d("you" , DAY);
         }
 
         myDb = new DataBaseHelper(getContext());
@@ -96,11 +111,14 @@ public class TaskList extends Fragment {
         StringBuffer stringBuffer = new StringBuffer();
         if(res != null && res.getCount() > 0) {
             while (res.moveToNext()) {
-                stringBuffer.append("TASK: " + res.getString(1) + "\n");
-                stringBuffer.append("TIME: " + res.getString(2) + "\n");
-                stringBuffer.append("ENTIRE: " + res.getString(3));
-                adapter.add(stringBuffer.toString());
-                stringBuffer = new StringBuffer();
+                if(res.getString(4).equals(DAY)) {
+                    stringBuffer.append("TASK: " + res.getString(1) + "\n");
+                    stringBuffer.append("TIME: " + res.getString(2) + "\n");
+                    stringBuffer.append("ENTIRE: " + res.getString(3));
+                    adapter.add(stringBuffer.toString());
+                    stringBuffer = new StringBuffer();
+                    Log.d("ClickMe","ClickME");
+                }
             }
         }
 

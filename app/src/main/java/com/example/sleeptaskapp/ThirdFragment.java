@@ -49,6 +49,7 @@ public class ThirdFragment extends Fragment {
     private TimePickerDialog dialogE;
     private String time;
     private String endtime;
+    private String DAY;
 
     public ThirdFragment() {
         // Required empty public constructor
@@ -78,6 +79,7 @@ public class ThirdFragment extends Fragment {
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
+            DAY = getArguments().getString("DAY");
         }
         myDb = new DataBaseHelper(getContext());
         time = "00:00";
@@ -132,8 +134,10 @@ public class ThirdFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 ClickMe();
+                Bundle bundle = new Bundle();
+                bundle.putString("DAY", DAY);
                 NavHostFragment.findNavController(ThirdFragment.this)
-                        .navigate(R.id.action_ThirdFragment_to_TaskListFragment);
+                        .navigate(R.id.action_ThirdFragment_to_TaskListFragment,bundle);
             }
         });
     }
@@ -162,7 +166,7 @@ public class ThirdFragment extends Fragment {
         /*Toast toast = Toast.makeText(getContext(), task, Toast.LENGTH_SHORT);
         toast.show();*/
 
-        Boolean result = myDb.insertData(task,time,endtime);
+        Boolean result = myDb.insertData(task,time,endtime,DAY);
         if(result) {
             Toast.makeText(getContext(), "OK", Toast.LENGTH_LONG).show();
         } else {

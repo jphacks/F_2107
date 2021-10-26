@@ -4,7 +4,10 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.navigation.fragment.NavHostFragment;
+import com.example.sleeptaskapp.TaskList;
 
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -80,9 +83,25 @@ public class CalendarFragment extends Fragment {
         binding.calendar.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
             @Override
             public void onSelectedDayChange(CalendarView view, int year, int month, int dayOfMonth) {
+
+
+                /*FragmentManager manager = getSupportFragmentManager();
+                FragmentTransaction transaction = manager.beginTransaction();
+
+                // 普通は引数は画面で入力されたメッセージをいれるのかな？
+                transaction.replace(R.id.container, TaskList.newInstance(String.valueOf(year),String.valueOf(month),String.valueOf(dayOfMonth)));
+
+                transaction.commit();*/
+
+                Bundle bundle = new Bundle();
+                String yearS = String.valueOf(year);
+                String monthS = String.valueOf(month + 1);
+                String dayOfMonthS = String.valueOf(dayOfMonth);
+                bundle.putString("DAY", yearS + monthS + dayOfMonthS);
+
                 Log.d("you" , year + "年" + (month + 1) + "月" + dayOfMonth + "日");
                 NavHostFragment.findNavController(CalendarFragment.this)
-                        .navigate(R.id.action_CalendarFragment_to_TaskList);
+                        .navigate(R.id.action_CalendarFragment_to_TaskList,bundle);
             }
         });
 
