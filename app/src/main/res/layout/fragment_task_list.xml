@@ -19,6 +19,14 @@
         android:layout_height="wrap_content"
         android:id="@+id/AddTaskButton"
         android:text="AddTask"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/BackButton"/>
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/BackButton"
+        android:text="Back"
         app:layout_constraintBottom_toBottomOf="parent"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
