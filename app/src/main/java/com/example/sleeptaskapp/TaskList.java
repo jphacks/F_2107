@@ -81,6 +81,16 @@ public class TaskList extends Fragment {
             }
         });
 
+        binding.BackButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Bundle bundle = new Bundle();
+                bundle.putString("DAY", DAY);
+                NavHostFragment.findNavController(TaskList.this)
+                        .navigate(R.id.action_TaskListFragment_to_CalendarFragment,bundle);
+            }
+        });
+
         ListView listView = binding.taskList;
         adapter=new ArrayAdapter<String>(getContext(), android.R.layout.simple_list_item_1);
         listView.setAdapter(adapter);
