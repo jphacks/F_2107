@@ -168,9 +168,9 @@ public class ThirdFragment extends Fragment {
 
         Boolean result = myDb.insertData(task,time,endtime,DAY);
         if(result) {
-            Toast.makeText(getContext(), "OK", Toast.LENGTH_LONG).show();
+            Toast.makeText(getContext(), "Add Task", Toast.LENGTH_SHORT).show();
         } else {
-            Toast.makeText(getContext(), "NG", Toast.LENGTH_LONG).show();
+            Toast.makeText(getContext(), "NG", Toast.LENGTH_SHORT).show();
         }
 
     }
