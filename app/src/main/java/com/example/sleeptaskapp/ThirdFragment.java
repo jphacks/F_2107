@@ -133,11 +133,13 @@ public class ThirdFragment extends Fragment {
         binding.buttonAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ClickMe();
-                Bundle bundle = new Bundle();
-                bundle.putString("DAY", DAY);
-                NavHostFragment.findNavController(ThirdFragment.this)
-                        .navigate(R.id.action_ThirdFragment_to_TaskListFragment,bundle);
+                boolean Addded = ClickMe();
+                if(Addded) {
+                    Bundle bundle = new Bundle();
+                    bundle.putString("DAY", DAY);
+                    NavHostFragment.findNavController(ThirdFragment.this)
+                            .navigate(R.id.action_ThirdFragment_to_TaskListFragment, bundle);
+                }
             }
         });
     }
@@ -161,18 +163,31 @@ public class ThirdFragment extends Fragment {
         endtime = String.format("%02d:%02d", hourOfDay,minute);
     }
 
-    private void ClickMe() {
-        String task = binding.editQuery.getText().toString();
+    private boolean ClickMe() {
+        String task = "";
+        task = binding.editQuery.getText().toString();
         /*Toast toast = Toast.makeText(getContext(), task, Toast.LENGTH_SHORT);
         toast.show();*/
+        String[] ms = time.split(":");
+        int start = Integer.parseInt(ms[0]) * 60 + Integer.parseInt(ms[1]);
+        ms = endtime.split(":");
+        int end = Integer.parseInt(ms[0]) * 60 + Integer.parseInt(ms[1]);
 
-        Boolean result = myDb.insertData(task,time,endtime,DAY);
-        if(result) {
-            Toast.makeText(getContext(), "Add Task", Toast.LENGTH_SHORT).show();
+        int length = end - start;
+        if(length > 0 && !task.equals("")) {
+            Boolean result = myDb.insertData(task, time, endtime, DAY);
+            if (result) {
+                Toast.makeText(getContext(), "Add Task", Toast.LENGTH_SHORT).show();
+                return true;
+            } else {
+                Toast.makeText(getContext(), "NG", Toast.LENGTH_SHORT).show();
+            }
+        } else if(task.equals("")) {
+            Toast.makeText(getContext(), "Task Name is None", Toast.LENGTH_SHORT).show();
         } else {
-            Toast.makeText(getContext(), "NG", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), "Set Time is Wrong", Toast.LENGTH_SHORT).show();
         }
-
+        return  false;
     }
 
     private void ClickMe2() {

@@ -91,6 +91,16 @@ public class TaskList extends Fragment {
             }
         });
 
+        binding.ShowCircle.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Bundle bundle = new Bundle();
+                bundle.putString("DAY", DAY);
+                NavHostFragment.findNavController(TaskList.this)
+                        .navigate(R.id.action_TaskList_to_CircleFragment,bundle);
+            }
+        });
+
         ListView listView = binding.taskList;
         adapter=new ArrayAdapter<String>(getContext(), android.R.layout.simple_list_item_1);
         listView.setAdapter(adapter);
@@ -118,18 +128,51 @@ public class TaskList extends Fragment {
 
     private void ClickMe2() {
         Cursor res = myDb.getAllData();
+        String[] Buffers;
+        int[] t_value;
         StringBuffer stringBuffer = new StringBuffer();
         if(res != null && res.getCount() > 0) {
+            Buffers = new String[res.getCount()];
+            t_value = new int[res.getCount()];
+            int T = 0;
             while (res.moveToNext()) {
                 if(res.getString(4).equals(DAY)) {
                     stringBuffer.append("TASK: " + res.getString(1) + "\n");
                     stringBuffer.append("TIME: " + res.getString(2) + "\n");
-                    stringBuffer.append("ENTIRE: " + res.getString(3));
-                    adapter.add(stringBuffer.toString());
+                    stringBuffer.append("END: " + res.getString(3));
+                    //adapter.add(stringBuffer.toString());
+                    String time = res.getString(2);
+                    String[] ms = time.split(":");
+
+                    Buffers[T] = stringBuffer.toString();
+                    t_value[T] = Integer.parseInt(ms[0]) * 60 + Integer.parseInt(ms[1]);
+
+                    Log.i("ClickMe",Buffers[T]);
                     stringBuffer = new StringBuffer();
-                    Log.d("ClickMe","ClickME");
+                    T++;
                 }
             }
+
+            for (int i = 0; i < t_value.length - 1; i++) {
+                for (int j = i + 1; j < t_value.length ; j++) {
+                    if (t_value[i] > t_value[j]) {
+                        int a = t_value[i];
+                        t_value[i] = t_value[j];
+                        t_value[j] = a;
+
+                        String b = Buffers[i];
+                        Buffers[i] = Buffers[j];
+                        Buffers[j] = b;
+
+                    }
+                }
+            }
+
+            for(int i=0;i< Buffers.length;i++) {
+                Log.i("ClickMe",String.valueOf(Buffers.length));
+                adapter.add(String.valueOf(Buffers[i]));
+            }
+
         }
 
     }

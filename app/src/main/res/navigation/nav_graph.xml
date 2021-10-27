@@ -56,6 +56,9 @@
         <action
             android:id="@+id/action_TaskListFragment_to_CalendarFragment"
             app:destination="@id/calendar" />
+        <action
+            android:id="@+id/action_TaskList_to_CircleFragment"
+            app:destination="@id/circle_center" />
     </fragment>
 
     <fragment
@@ -66,6 +69,17 @@
 
         <action
             android:id="@+id/action_CalendarFragment_to_TaskList"
+            app:destination="@id/TaskLit" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/circle_center"
+        android:name="com.example.sleeptaskapp.CircleFragment"
+        android:label="Calendar Fragment"
+        tools:layout="@layout/fragment_circle">
+
+        <action
+            android:id="@+id/action_CircleFragment_to_TaskList"
             app:destination="@id/TaskLit" />
     </fragment>
 
