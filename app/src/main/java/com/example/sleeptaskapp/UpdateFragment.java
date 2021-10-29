@@ -126,7 +126,22 @@ public class UpdateFragment extends Fragment {
             }
         });
 
-        binding.buttonAdd.setOnClickListener(new View.OnClickListener() {
+        binding.buttonDel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                int Added = -1;
+                Added = DEL();
+                Log.d("ID",ID);
+                if(Added != -1) {
+                    Bundle bundle = new Bundle();
+                    bundle.putString("DAY", DAY);
+                    NavHostFragment.findNavController(UpdateFragment.this)
+                            .navigate(R.id.action_UpdateFragment_to_TaskListFragment, bundle);
+                }
+            }
+        });
+
+        binding.buttonAddA.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 boolean Addded = ClickMe();
@@ -139,23 +154,15 @@ public class UpdateFragment extends Fragment {
             }
         });
 
-        binding.buttonDel.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                int Added = -1;
-                Added = myDb.deleteData(ID);
-                if(Added != -1) {
-                    Bundle bundle = new Bundle();
-                    bundle.putString("DAY", DAY);
-                    NavHostFragment.findNavController(UpdateFragment.this)
-                            .navigate(R.id.action_UpdateFragment_to_TaskListFragment, bundle);
-                }
-            }
-        });
+
 
         binding.editQuery.setText(Btask);
         binding.textviewTime.setText(time);
         binding.textviewEnd.setText(endtime);
+    }
+
+    private int DEL() {
+        return myDb.deleteData(ID);
     }
 
     private void SetTime(int hourOfDay,int minute) {
