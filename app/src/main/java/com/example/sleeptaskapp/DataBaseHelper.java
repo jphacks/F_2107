@@ -57,6 +57,28 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         }
     }
 
+    public boolean updateData(String id,String task, String time, String endtime,String DAY) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(COL_2,task);
+        contentValues.put(COL_3,time);
+        contentValues.put(COL_4,endtime);
+        contentValues.put(COL_5,DAY);
+        int result = db.update(TABLE_NAME, contentValues,"ID =?", new String[]{id});
+        if(result > 0) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+    public Integer deleteData(String id) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        int i = db.delete(TABLE_NAME,"ID=?",new String[]{id});
+        Log.d("ID",String.valueOf(i));
+        return i;
+    }
+
+
     public Cursor getAllData() {
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor res = db.rawQuery("Select * from " + TABLE_NAME,null);
