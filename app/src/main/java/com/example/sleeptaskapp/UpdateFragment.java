@@ -1,36 +1,32 @@
 package com.example.sleeptaskapp;
 
 import android.app.TimePickerDialog;
-import android.content.Context;
-import android.content.Intent;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.fragment.NavHostFragment;
 
-import android.provider.ContactsContract;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
-import android.widget.EditText;
+import android.widget.DatePicker;
 import android.widget.TimePicker;
 import android.widget.Toast;
-import android.widget.DatePicker;
 
-import com.example.sleeptaskapp.databinding.FragmentThirdBinding;
+import com.example.sleeptaskapp.databinding.FragmentUpdateBinding;
 
 import java.util.Calendar;
 
 /**
  * A simple {@link Fragment} subclass.
- * Use the {@link ThirdFragment#newInstance} factory method to
+ * Use the {@link UpdateFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class ThirdFragment extends Fragment {
+public class UpdateFragment extends Fragment {
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -38,7 +34,7 @@ public class ThirdFragment extends Fragment {
     private static final String ARG_PARAM2 = "param2";
     private DatePicker datePicker;
 
-    private FragmentThirdBinding binding;
+    private FragmentUpdateBinding binding;
 
     DataBaseHelper myDb;
 
@@ -50,10 +46,8 @@ public class ThirdFragment extends Fragment {
     private String time;
     private String endtime;
     private String DAY;
-
-    public ThirdFragment() {
-        // Required empty public constructor
-    }
+    private String Btask;
+    private String ID;
 
     /**
      * Use this factory method to create a new instance of
@@ -61,11 +55,11 @@ public class ThirdFragment extends Fragment {
      *
      * @param param1 Parameter 1.
      * @param param2 Parameter 2.
-     * @return A new instance of fragment ThirdFragment.
+     * @return A new instance of fragment UpdateFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static ThirdFragment newInstance(String param1, String param2) {
-        ThirdFragment fragment = new ThirdFragment();
+    public static UpdateFragment newInstance(String param1, String param2) {
+        UpdateFragment fragment = new UpdateFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
@@ -80,15 +74,18 @@ public class ThirdFragment extends Fragment {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
             DAY = getArguments().getString("DAY");
+            time = getArguments().getString("START");
+            endtime = getArguments().getString("END");
+            Btask = getArguments().getString("TASK");
+            ID = getArguments().getString("ID");
         }
         myDb = new DataBaseHelper(getContext());
-        time = "00:00";
-        endtime = "00:00";
+
 
         Calendar calendar = Calendar.getInstance();
         int hour = calendar.get(Calendar.HOUR_OF_DAY);
         int minute = calendar.get(Calendar.MINUTE);
-         dialog = new TimePickerDialog(
+        dialog = new TimePickerDialog(
                 getContext(),
                 new TimePickerDialog.OnTimeSetListener(){
                     @Override
@@ -111,7 +108,6 @@ public class ThirdFragment extends Fragment {
 
 
     }
-
 
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -137,21 +133,30 @@ public class ThirdFragment extends Fragment {
                 if(Addded) {
                     Bundle bundle = new Bundle();
                     bundle.putString("DAY", DAY);
-                    NavHostFragment.findNavController(ThirdFragment.this)
-                            .navigate(R.id.action_ThirdFragment_to_TaskListFragment, bundle);
+                    NavHostFragment.findNavController(UpdateFragment.this)
+                            .navigate(R.id.action_UpdateFragment_to_TaskListFragment, bundle);
                 }
             }
         });
+
+        binding.buttonDel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                int Added = -1;
+                Added = myDb.deleteData(ID);
+                if(Added != -1) {
+                    Bundle bundle = new Bundle();
+                    bundle.putString("DAY", DAY);
+                    NavHostFragment.findNavController(UpdateFragment.this)
+                            .navigate(R.id.action_UpdateFragment_to_TaskListFragment, bundle);
+                }
+            }
+        });
+
+        binding.editQuery.setText(Btask);
+        binding.textviewTime.setText(time);
+        binding.textviewEnd.setText(endtime);
     }
-
-    /*private void ClickMe3() {
-        Intent scjIntent = new Intent(Intent.ACTION_EDIT);
-        scjIntent.setType("vnd.android.cursor.item/event");
-        scjIntent.putExtra("title", "");
-        scjIntent.putExtra("description", "");
-        startActivity(scjIntent);
-
-    }*/
 
     private void SetTime(int hourOfDay,int minute) {
         binding.textviewTime.setText(String.format("%02d:%02d", hourOfDay,minute));
@@ -175,7 +180,7 @@ public class ThirdFragment extends Fragment {
 
         int length = end - start;
         if(length > 0 && !task.equals("")) {
-            Boolean result = myDb.insertData(task, time, endtime, DAY);
+            Boolean result = myDb.updateData(ID,task, time, endtime, DAY);
             if (result) {
                 Toast.makeText(getContext(), "Add Task", Toast.LENGTH_SHORT).show();
                 return true;
@@ -189,6 +194,8 @@ public class ThirdFragment extends Fragment {
         }
         return  false;
     }
+
+
 
     private void ClickMe2() {
         Cursor res = myDb.getAllData();
@@ -208,9 +215,7 @@ public class ThirdFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-
-
-        binding = FragmentThirdBinding.inflate(inflater, container, false);
+        binding = FragmentUpdateBinding.inflate(inflater, container, false);
         // Inflate the layout for this fragment
         return binding.getRoot();
     }

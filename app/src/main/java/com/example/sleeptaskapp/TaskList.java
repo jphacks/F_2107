@@ -1,9 +1,19 @@
 package com.example.sleeptaskapp;
 
+import static androidx.core.content.ContextCompat.getSystemService;
+
+import android.app.AlertDialog;
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.database.Cursor;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.fragment.NavHostFragment;
 
@@ -11,6 +21,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -31,6 +42,7 @@ public class TaskList extends Fragment {
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
     private static final String ARG_PARAM3 = "param3";
+    private static final String CHANNEL_ID = "sample_notification_channel";
     DataBaseHelper myDb;
 
     private FragmentTaskListBinding binding;
@@ -42,8 +54,12 @@ public class TaskList extends Fragment {
     int year;
     int month;
     int dayOfMonth;
+    int ID[];
     private ArrayAdapter<String> adapter;
     private String DAY;
+    //通知オブジェクトの用意と初期化
+    Notification notification = null;
+
 
     public TaskList() {
         // Required empty public constructor
@@ -91,9 +107,39 @@ public class TaskList extends Fragment {
             }
         });
 
+        binding.ShowCircle.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                Log.d("f","FFFFFFF");
+                Bundle bundle = new Bundle();
+                bundle.putString("DAY", DAY);
+                NavHostFragment.findNavController(TaskList.this)
+                        .navigate(R.id.action_TaskList_to_CircleFragment,bundle);
+            }
+        });
+
         ListView listView = binding.taskList;
         adapter=new ArrayAdapter<String>(getContext(), android.R.layout.simple_list_item_1);
         listView.setAdapter(adapter);
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+                String item = (String)adapterView.getItemAtPosition(position);
+                Toast.makeText(getContext(),"Item:" + item,Toast.LENGTH_SHORT).show();
+                Bundle bundle = new Bundle();
+                bundle.putString("DAY", DAY);
+                String[] content = item.split("\n");
+                Log.d("FFFF",content[0]);
+                bundle.putString("TASK", content[0]);
+                bundle.putString("START", content[1].split(":")[1] + ":" + content[1].split(":")[2]);
+                bundle.putString("END", content[2].split(":")[1] + ":" + content[2].split(":")[2]);
+                bundle.putString("ID", String.valueOf(ID[position]));
+                NavHostFragment.findNavController(TaskList.this)
+                        .navigate(R.id.action_TaskList_to_UpdateFragment,bundle);
+
+            }
+        });
         ClickMe2();
 
     }
@@ -117,19 +163,82 @@ public class TaskList extends Fragment {
     }
 
     private void ClickMe2() {
+        int total_time = 0;
         Cursor res = myDb.getAllData();
+        String[] Buffers;
+        int[] t_value;
         StringBuffer stringBuffer = new StringBuffer();
         if(res != null && res.getCount() > 0) {
+            Buffers = new String[res.getCount()];
+            t_value = new int[res.getCount()];
+            ID = new int[res.getCount()];
+            int T = 0;
+
             while (res.moveToNext()) {
                 if(res.getString(4).equals(DAY)) {
-                    stringBuffer.append("TASK: " + res.getString(1) + "\n");
-                    stringBuffer.append("TIME: " + res.getString(2) + "\n");
-                    stringBuffer.append("ENTIRE: " + res.getString(3));
-                    adapter.add(stringBuffer.toString());
+                    ID[T] = Integer.parseInt(res.getString(0));
+                    stringBuffer.append(res.getString(1) + "\n");
+                    stringBuffer.append("TIME:" + res.getString(2) + "\n");
+                    stringBuffer.append("END:" + res.getString(3));
+                    //adapter.add(stringBuffer.toString());
+                    String time = res.getString(2);
+                    String etime = res.getString(3);
+                    String[] ms = time.split(":");
+                    String[] ems = etime.split(":");
+
+                    Buffers[T] = stringBuffer.toString();
+                    t_value[T] = (Integer.parseInt(ms[0]))* 60 + (Integer.parseInt(ms[1]));
+                    int FFFF = (Integer.parseInt(ems[0]) - Integer.parseInt(ms[0]) )* 60 + (Integer.parseInt(ems[1]) - Integer.parseInt(ms[1]) );
+                    total_time += FFFF;
+
+                    Log.i("ClickMe",Buffers[T]);
                     stringBuffer = new StringBuffer();
-                    Log.d("ClickMe","ClickME");
+                    T++;
                 }
             }
+
+            for (int i = 0; i < t_value.length - 1; i++) {
+                for (int j = i + 1; j < t_value.length ; j++) {
+                    if (t_value[i] > t_value[j]) {
+                        int a = t_value[i];
+                        t_value[i] = t_value[j];
+                        t_value[j] = a;
+
+                        String b = Buffers[i];
+                        Buffers[i] = Buffers[j];
+                        Buffers[j] = b;
+
+                        a = ID[i];
+                        ID[i] = ID[j];
+                        ID[j] = a;
+
+                    }
+                }
+            }
+
+            for(int i=0;i< Buffers.length;i++) {
+                if(Buffers[i] != null) {
+                    Log.i("ClickMe", String.valueOf(Buffers.length));
+                    adapter.add(String.valueOf(Buffers[i]));
+                }
+            }
+
+            Log.d("total",String.valueOf(total_time));
+
+            if(total_time > 1020) {
+                // notificationId is a unique int for each notification that you must define
+                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                builder.setMessage( "睡眠は7時間以上とれるようにタスクを調整してください！")
+                        .setTitle("警告！タスクを詰めすぎています！" )
+                        .setIcon(R.drawable.dialog_icon)
+                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+// ボタンをクリックしたときの動作
+                            }
+                        });
+                builder.show();
+            }
+
         }
 
     }
