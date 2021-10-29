@@ -1,5 +1,9 @@
 package com.example.sleeptaskapp;
 
+import android.app.AlertDialog;
+import android.app.TimePickerDialog;
+import android.content.DialogInterface;
+import android.database.Cursor;
 import android.graphics.Color;
 import android.os.Bundle;
 
@@ -12,6 +16,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CalendarView;
+import android.widget.TimePicker;
 
 import com.example.sleeptaskapp.databinding.FragmentCircleBinding;
 import com.example.sleeptaskapp.databinding.FragmentFirstBinding;
@@ -24,6 +29,7 @@ import com.github.mikephil.charting.formatter.PercentFormatter;
 import com.github.mikephil.charting.utils.ColorTemplate;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 /**
@@ -41,7 +47,10 @@ public class CircleFragment extends Fragment {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
+    private String DAY;
     private FragmentCircleBinding binding;
+    DataBaseHelper myDb;
+    int ID[];
 
     public CircleFragment() {
         // Required empty public constructor
@@ -71,7 +80,16 @@ public class CircleFragment extends Fragment {
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
+            DAY = getArguments().getString("DAY");
+            Log.d("you" , DAY);
         }
+        myDb = new DataBaseHelper(getContext());
+
+
+        Calendar calendar = Calendar.getInstance();
+        int hour = calendar.get(Calendar.HOUR_OF_DAY);
+        int minute = calendar.get(Calendar.MINUTE);
+
     }
 
     @Override
@@ -87,7 +105,8 @@ public class CircleFragment extends Fragment {
 
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        createPieChart();
+        ClickMe2();
+
 
 
 
@@ -119,7 +138,7 @@ public class CircleFragment extends Fragment {
 
     }
 
-    private void createPieChart() {
+    private void createPieChart(String[] TaskName,int[] TaskTime) {
         PieChart pieChart = binding.pieChartExample;
 
         pieChart.setDrawHoleEnabled(true); // 真ん中に穴を空けるかどうか
@@ -128,7 +147,7 @@ public class CircleFragment extends Fragment {
         pieChart.setRotationAngle(270);          // 開始位置の調整
         pieChart.setRotationEnabled(true);       // 回転可能かどうか
         pieChart.getLegend().setEnabled(true);   //
-        pieChart.setData(createPieChartData());
+        pieChart.setData(createPieChartData(TaskName,TaskTime));
 
         // 更新
         pieChart.invalidate();
@@ -137,27 +156,30 @@ public class CircleFragment extends Fragment {
     }
 
     // pieChartのデータ設定
-    private PieData createPieChartData() {
+    private PieData createPieChartData(String[] TaskName,int[] TaskTime) {
         ArrayList<PieEntry> yVals = new ArrayList<>();
         ArrayList<String> xVals = new ArrayList<>();
         ArrayList<Integer> colors = new ArrayList<>();
 
-        xVals.add("A");
-        xVals.add("B");
-        xVals.add("C");
 
-        yVals.add(new PieEntry(20, 0));
-        yVals.add(new PieEntry(30, 1));
-        yVals.add(new PieEntry(50, 2));
+        int total_time = 0;
+        for(int i=0;i<TaskName.length;i++) {
+            xVals.add(String.valueOf(i));
+            yVals.add(new PieEntry(TaskTime[i], TaskName[i] + "\n" + String.valueOf(TaskTime[i] / 60) +"時間" + String.valueOf(TaskTime[i] % 60) + "分"));
+            Log.d(TaskName[i],String.valueOf(TaskTime[i]));
+            total_time += TaskTime[i];
+            colors.add(ColorTemplate.COLORFUL_COLORS[i]);
+        }
+
+        int sleeptime = 1440 - total_time;
+        yVals.add(new PieEntry(sleeptime,"Sleep" + "\n" + String.valueOf(sleeptime / 60) +"時間" + String.valueOf(sleeptime % 60) + "分"));
+        colors.add(ColorTemplate.COLORFUL_COLORS[TaskName.length]);
 
         PieDataSet dataSet = new PieDataSet(yVals, "Data");
         dataSet.setSliceSpace(5f);
         dataSet.setSelectionShift(1f);
 
         // 色の設定
-        colors.add(ColorTemplate.COLORFUL_COLORS[0]);
-        colors.add(ColorTemplate.COLORFUL_COLORS[1]);
-        colors.add(ColorTemplate.COLORFUL_COLORS[2]);
         dataSet.setColors(colors);
         dataSet.setDrawValues(true);
 
@@ -169,5 +191,99 @@ public class CircleFragment extends Fragment {
         data.setValueTextColor(Color.WHITE);
         return data;
     }
+
+    private void ClickMe2() {
+        int total_time = 0;
+        Cursor res = myDb.getAllData();
+        String[] Buffers;
+        String[] TaskName;
+        int[] t_value;
+        int[] tasktime;
+        StringBuffer stringBuffer = new StringBuffer();
+        if(res != null && res.getCount() > 0) {
+            Buffers = new String[res.getCount()];
+            t_value = new int[res.getCount()];
+            ID = new int[res.getCount()];
+            tasktime = new int[res.getCount()];
+            TaskName = new String[res.getCount()];
+            int T = 0;
+
+            while (res.moveToNext()) {
+                if(res.getString(4).equals(DAY)) {
+                    ID[T] = Integer.parseInt(res.getString(0));
+                    stringBuffer.append(res.getString(1) + "\n");
+                    stringBuffer.append("TIME:" + res.getString(2) + "\n");
+                    stringBuffer.append("END:" + res.getString(3));
+                    //adapter.add(stringBuffer.toString());
+                    String time = res.getString(2);
+                    String etime = res.getString(3);
+                    String[] ms = time.split(":");
+                    String[] ems = etime.split(":");
+                    TaskName[T] = res.getString(1);
+
+                    Buffers[T] = stringBuffer.toString();
+                    t_value[T] = (Integer.parseInt(ms[0]))* 60 + (Integer.parseInt(ms[1]));
+                    tasktime[T] = (Integer.parseInt(ems[0]) - Integer.parseInt(ms[0]) )* 60 + (Integer.parseInt(ems[1]) - Integer.parseInt(ms[1]) );
+                    total_time += tasktime[T];
+
+                    Log.i("ClickMe",Buffers[T]);
+                    stringBuffer = new StringBuffer();
+                    T++;
+                }
+            }
+
+            for (int i = 0; i < t_value.length - 1; i++) {
+                for (int j = i + 1; j < t_value.length ; j++) {
+                    if (t_value[i] > t_value[j]) {
+                        int a = t_value[i];
+                        t_value[i] = t_value[j];
+                        t_value[j] = a;
+
+                        String b = Buffers[i];
+                        Buffers[i] = Buffers[j];
+                        Buffers[j] = b;
+
+                        b = TaskName[i];
+                        TaskName[i] = TaskName[j];
+                        TaskName[j] = b;
+
+                        a = ID[i];
+                        ID[i] = ID[j];
+                        ID[j] = a;
+
+                        a = tasktime[i];
+                        tasktime[i] = tasktime[j];
+                        tasktime[j] = a;
+                    }
+                }
+            }
+
+            for(int i=0;i< Buffers.length;i++) {
+                if(Buffers[i] != null) {
+                    Log.i("ClickMe", String.valueOf(Buffers.length));
+                }
+            }
+
+            Log.d("total",String.valueOf(total_time));
+            createPieChart(TaskName,tasktime);
+
+            /*if(total_time > 1020) {
+                // notificationId is a unique int for each notification that you must define
+                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                builder.setMessage( "睡眠は7時間以上とれるようにタスクを調整してください！")
+                        .setTitle("警告！タスクを詰めすぎています！" )
+                        .setIcon(R.drawable.dialog_icon)
+                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+// ボタンをクリックしたときの動作
+                            }
+                        });
+                builder.show();
+            }*/
+
+        }
+
+    }
+
 
 }
