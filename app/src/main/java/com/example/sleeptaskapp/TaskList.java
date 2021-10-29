@@ -126,7 +126,7 @@ public class TaskList extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
                 String item = (String)adapterView.getItemAtPosition(position);
-                Toast.makeText(getContext(),"Item:" + item,Toast.LENGTH_SHORT).show();
+                //Toast.makeText(getContext(),"Item:" + item,Toast.LENGTH_SHORT).show();
                 Bundle bundle = new Bundle();
                 bundle.putString("DAY", DAY);
                 String[] content = item.split("\n");
@@ -168,10 +168,21 @@ public class TaskList extends Fragment {
         String[] Buffers;
         int[] t_value;
         StringBuffer stringBuffer = new StringBuffer();
+        int count = 0;
         if(res != null && res.getCount() > 0) {
-            Buffers = new String[res.getCount()];
-            t_value = new int[res.getCount()];
-            ID = new int[res.getCount()];
+            while (res.moveToNext()) {
+                if (res.getString(4).equals(DAY)) {
+                    count++;
+                }
+            }
+        }
+
+
+        res = myDb.getAllData();
+        if(res != null && res.getCount() > 0) {
+            Buffers = new String[count];
+            t_value = new int[count];
+            ID = new int[count];
             int T = 0;
 
             while (res.moveToNext()) {

@@ -8,7 +8,7 @@
     <fragment
         android:id="@+id/FirstFragment"
         android:name="com.example.sleeptaskapp.FirstFragment"
-        android:label="@string/first_fragment_label"
+        android:label="NERO"
         tools:layout="@layout/fragment_first">
 
         <action

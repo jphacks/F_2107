@@ -52,6 +52,15 @@ public class CircleFragment extends Fragment {
     DataBaseHelper myDb;
     int ID[];
 
+    public static final int[] COLORFUL_COLORS = {
+            Color.rgb(193, 37, 82), Color.rgb(255, 102, 0), Color.rgb(245, 199, 0),
+            Color.rgb(106, 150, 31), Color.rgb(179, 100, 53),Color.rgb(192, 255, 140), Color.rgb(255, 247, 140), Color.rgb(255, 208, 140),
+            Color.rgb(140, 234, 255), Color.rgb(255, 140, 157),Color.rgb(64, 89, 128), Color.rgb(149, 165, 124), Color.rgb(217, 184, 162),
+            Color.rgb(191, 134, 134), Color.rgb(179, 48, 80),Color.rgb(217, 80, 138), Color.rgb(254, 149, 7), Color.rgb(254, 247, 120),
+            Color.rgb(106, 167, 134), Color.rgb(53, 194, 209),Color.rgb(207, 248, 246), Color.rgb(148, 212, 212), Color.rgb(136, 180, 187),
+            Color.rgb(118, 174, 175), Color.rgb(42, 109, 130)
+    };
+
     public CircleFragment() {
         // Required empty public constructor
     }
@@ -168,12 +177,12 @@ public class CircleFragment extends Fragment {
             yVals.add(new PieEntry(TaskTime[i], TaskName[i] + "\n" + String.valueOf(TaskTime[i] / 60) +"時間" + String.valueOf(TaskTime[i] % 60) + "分"));
             Log.d(TaskName[i],String.valueOf(TaskTime[i]));
             total_time += TaskTime[i];
-            colors.add(ColorTemplate.COLORFUL_COLORS[i]);
+            colors.add(COLORFUL_COLORS[i]);
         }
 
         int sleeptime = 1440 - total_time;
         yVals.add(new PieEntry(sleeptime,"Sleep" + "\n" + String.valueOf(sleeptime / 60) +"時間" + String.valueOf(sleeptime % 60) + "分"));
-        colors.add(ColorTemplate.COLORFUL_COLORS[TaskName.length]);
+        colors.add(Color.rgb(0, 255, 0));
 
         PieDataSet dataSet = new PieDataSet(yVals, "Data");
         dataSet.setSliceSpace(5f);
@@ -200,12 +209,23 @@ public class CircleFragment extends Fragment {
         int[] t_value;
         int[] tasktime;
         StringBuffer stringBuffer = new StringBuffer();
+        int count = 0;
+
         if(res != null && res.getCount() > 0) {
-            Buffers = new String[res.getCount()];
-            t_value = new int[res.getCount()];
-            ID = new int[res.getCount()];
-            tasktime = new int[res.getCount()];
-            TaskName = new String[res.getCount()];
+            while (res.moveToNext()) {
+                if (res.getString(4).equals(DAY)) {
+                    count++;
+                }
+            }
+        }
+
+        res = myDb.getAllData();
+        if(res != null && res.getCount() > 0) {
+            Buffers = new String[count];
+            t_value = new int[count];
+            ID = new int[count];
+            tasktime = new int[count];
+            TaskName = new String[count];
             int T = 0;
 
             while (res.moveToNext()) {
