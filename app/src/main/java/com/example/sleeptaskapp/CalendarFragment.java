@@ -95,8 +95,20 @@ public class CalendarFragment extends Fragment {
 
                 Bundle bundle = new Bundle();
                 String yearS = String.valueOf(year);
-                String monthS = String.valueOf(month + 1);
-                String dayOfMonthS = String.valueOf(dayOfMonth);
+                String monthS = "";
+                String dayOfMonthS = "";
+
+                if(month + 1 < 10) {
+                    monthS = "0" + String.valueOf(month + 1);
+                } else {
+                    monthS = String.valueOf(month + 1);
+                }
+
+                if(dayOfMonth < 10) {
+                    dayOfMonthS = "0" + String.valueOf(dayOfMonth);
+                } else {
+                    dayOfMonthS = String.valueOf(dayOfMonth);
+                }
                 bundle.putString("DAY", yearS + monthS + dayOfMonthS);
 
                 Log.d("you" , year + "年" + (month + 1) + "月" + dayOfMonth + "日");
