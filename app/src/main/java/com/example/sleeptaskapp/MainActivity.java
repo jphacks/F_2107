@@ -166,7 +166,7 @@ public class MainActivity extends AppCompatActivity {
                     ID[T] = Integer.parseInt(res.getString(0));
                     stringBuffer.append(res.getString(1) + "\n");
                     stringBuffer.append("TIME:" + res.getString(2) + "\n");
-                    stringBuffer.append("END:" + res.getString(3));
+                    stringBuffer.append("END:" + res.getString(3) + "\n");
                     //adapter.add(stringBuffer.toString());
                     String time = res.getString(2);
                     String etime = res.getString(3);
