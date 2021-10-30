@@ -189,7 +189,7 @@ public class UpdateFragment extends Fragment {
         if(length > 0 && !task.equals("")) {
             Boolean result = myDb.updateData(ID,task, time, endtime, DAY);
             if (result) {
-                Toast.makeText(getContext(), "Add Task", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), "Edit Task", Toast.LENGTH_SHORT).show();
                 return true;
             } else {
                 Toast.makeText(getContext(), "NG", Toast.LENGTH_SHORT).show();

@@ -165,8 +165,8 @@ public class MainActivity extends AppCompatActivity {
                 if(res.getString(4).equals(DAY)) {
                     ID[T] = Integer.parseInt(res.getString(0));
                     stringBuffer.append(res.getString(1) + "\n");
-                    stringBuffer.append("TIME:" + res.getString(2) + "\n");
-                    stringBuffer.append("END:" + res.getString(3) + "\n");
+                    stringBuffer.append("開始:" + res.getString(2) + "\n");
+                    stringBuffer.append("終了:" + res.getString(3) + "\n");
                     //adapter.add(stringBuffer.toString());
                     String time = res.getString(2);
                     String etime = res.getString(3);
@@ -221,7 +221,7 @@ public class MainActivity extends AppCompatActivity {
             i.setData(Uri.parse("email"));
             String[] s = {"JPHACKSPROJECTMANAGER@gmail.com"};
             i.putExtra(Intent.EXTRA_EMAIL,s);
-            i.putExtra(Intent.EXTRA_SUBJECT,buf.toString());
+            i.putExtra(Intent.EXTRA_SUBJECT,DAY + "\n" + buf.toString());
             i.putExtra(Intent.EXTRA_TEXT,"");
             i.setType("message/rfc822");
             if(i.resolveActivity(getPackageManager())!=null){
